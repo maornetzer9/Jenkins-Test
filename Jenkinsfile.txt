@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = 'maornetzer/flask_demo:latest'
+        CONTAINER_NAME = 'flask_demo'
+        PORT = '5000'
+    }
+
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                echo sh "docker build -t ${IMAGE_NAME} ."
+            }
+        }
+
+
+
+        stage('Stop Container') {
+            steps {
+                sh '''
+                    docker stop ${CONTAINER_NAME} || true
+                    docker rm ${CONTAINER_NAME} || true
+                '''
+            }
+        }
+
+
+
+        stage('Run Container') {
+            steps {
+                sh '''
+                    docker run -d --name ${CONTAINER_NAME} -p ${PORT}:${PORT} ${IMAGE_NAME}
+                '''
+            }
+        }
+    }
+
+}
